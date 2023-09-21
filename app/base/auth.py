@@ -36,7 +36,7 @@ def decode_token(token: str, algorithm: str = "HS256") -> dict[str, Any]:
     )
 
 
-def login(response: Response, user: schemas.UserOutput) -> None:
+def login(response: Response, user: schemas.UserProfile) -> None:
     """쿠키를 응답하여 자동 로그인합니다."""
     payload = {"user_id": user.id}
     access_token = create_token(payload, datetime.timedelta(hours=1))

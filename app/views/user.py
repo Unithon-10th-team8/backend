@@ -16,14 +16,14 @@ router = APIRouter()
 @router.post(
     "/social-login/{provider}",
     status_code=HTTP_200_OK,
-    response_model=schemas.UserOutput,
+    response_model=schemas.UserProfile,
 )
 async def social_login(
     response: Response,
     provider: Literal["kakao", "apple"],
     token: str = Body(embed=True),
     user_service: UserService = Depends(deps.user_service),
-) -> schemas.UserOutput:
+) -> schemas.UserProfile:
     """소셜 로그인을 합니다."""
     if provider == "kakao":
         kakao_provider = KakaoAuthProvider(token)

@@ -21,7 +21,7 @@ async def current_user(
         user_repo = UserRepository()
         user = await user_repo.get(result["user_id"])
         if user:
-            return user.to_output()
+            return user.profile
 
         raise NotFoundError(f"{result['user_id']} 유저는 존재하지 않습니다.")
     else:

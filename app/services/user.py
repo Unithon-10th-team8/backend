@@ -8,11 +8,11 @@ class UserService:
 
     async def get_or_create_user(
         self, provider: str, uid: int | str
-    ) -> schemas.UserOutput:
+    ) -> schemas.UserProfile:
         """유저를 가져오거나 생성합니다."""
         user = await self._user_repo.get_by_uid(uid)
         if user:
-            return user.to_output()
+            return user.profile
         else:
             user = await self._user_repo.create(orm.User(uid=uid, provider=provider))
-            return user.to_output()
+            return user.profile
