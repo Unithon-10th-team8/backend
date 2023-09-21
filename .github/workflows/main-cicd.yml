@@ -43,9 +43,10 @@ jobs:
 
     - name: Update deployment tag in GitOps repo
       run: |
-        APP_NAME="unithon-backend-main"
+        IMAGE_NAME="unithon-backend-main"
+        APP_NAME="backend-main"
         cd gitops/app/${APP_NAME}
-        sed -i "s|image: ${{ secrets.DOCKERHUB_USERNAME }}/${APP_NAME}:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/${APP_NAME}:${{ github.run_number }}|g" deployment.yaml
+        sed -i "s|image: ${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${{ github.run_number }}|g" deployment.yaml
         git config user.name "dokdo2013"
         git config user.email "hyeonwoo5342@gmail.com"
         git add .
