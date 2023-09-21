@@ -1,17 +1,18 @@
-import datetime
-from pydantic import BaseModel
 from app.schemas import UserProfile
 
-from app.utils import tz_now
+import sqlalchemy as sa
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.base.db import TimestampBase
 
 
-class User(BaseModel):
-    id: int
-    uid: int | str
-    provider: str
-    is_active: bool = True
-    created_at: datetime.datetime = tz_now()
-    updated_at: datetime.datetime = tz_now()
+class User(TimestampBase):
+    __tablename__ = "user"
+
+    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    uid: Mapped[str] = mapped_column(sa.String(128), nullable=False)
+    provider: Mapped[str] = mapped_column(sa.String(128), nullable=False)
+    is_active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
 
     @property
     def profile(self) -> UserProfile:

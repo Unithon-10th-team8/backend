@@ -28,7 +28,7 @@ def datetime_to_msepoch(dt: datetime) -> int:
     return int(dt.timestamp() * 1000)
 
 
-def msepoch_to_datetime(ms: int | float, tz: str = "Asia/Seoul") -> datetime:
+def msepoch_to_datetime(ms: float, tz: str = "Asia/Seoul") -> datetime:
     """Millisecond Epoch를 Aware Datetime객체로 변환합니다.
 
     Args:
