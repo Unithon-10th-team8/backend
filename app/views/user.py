@@ -33,3 +33,13 @@ async def social_login(
     user = await user_service.get_or_create_user(provider, user_info["uid"])
     login(response, user)
     return user
+
+
+@router.get(
+    "/test-user",
+    status_code=HTTP_200_OK,
+    response_model=schemas.UserProfile,
+)
+async def test_user(user_service: UserService = Depends(deps.user_service)):
+    user = await user_service.get_or_create_user("kakao", "123")
+    return user

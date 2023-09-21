@@ -2,8 +2,8 @@ from pydantic_settings import BaseSettings
 
 
 class Config(BaseSettings):
-    SECRET_KEY: str
-    DB_URL: str
+    secret_key: str
+    db_url: str
 
     class Config:
         env_file = "./secrets/.env"

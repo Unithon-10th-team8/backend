@@ -4,7 +4,7 @@ import requests
 
 
 class ProviderUserInfo(TypedDict):
-    uid: int | str
+    uid: str
 
 
 class KakaoAuthProvider:
@@ -25,5 +25,5 @@ class KakaoAuthProvider:
             raise ValidationError(message)
 
         data = res.json()
-        user_info = ProviderUserInfo(uid=data["id"])
+        user_info = ProviderUserInfo(uid=str(data["id"]))
         return user_info

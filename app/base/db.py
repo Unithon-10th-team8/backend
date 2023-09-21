@@ -69,4 +69,4 @@ class DB:
             await self._session_factory.remove()
 
 
-db = DB(str(config.DB_URL))
+db = DB(str(config.db_url))

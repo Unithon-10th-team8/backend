@@ -4,7 +4,7 @@ import click
 import uvicorn
 
 from alembic.config import Config
-from app.abase.config import config
+from app.base.config import config
 
 
 @click.group()
