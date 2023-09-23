@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,7 +39,7 @@ class CalendarRepository:
         return list(res.scalars())
 
     async def fetch_user_calendars(
-        self, user_id: int, offset: int, limit: int
+        self, user_id: int, year: int | None, month: int | None, offset: int, limit: int
     ) -> list[orm.Calendar]:
         query = (
             sa.select(orm.Calendar)
@@ -49,9 +50,19 @@ class CalendarRepository:
                     orm.Calendar.deleted_at.is_(None),
                 )
             )
-            .offset(offset)
-            .limit(limit)
         )
+
+        # year가 None인 경우, 올해 연도로 설정
+        if year is None:
+            year = datetime.now().year
+
+        query = query.where(sa.extract("year", orm.Calendar.start_dt) == year)
+
+        # month가 주어진 경우, 쿼리에 추가
+        if month is not None:
+            query = query.where(sa.extract("month", orm.Calendar.start_dt) == month)
+
+        query = query.offset(offset).limit(limit)
         res = await self._session.execute(query)
         return list(res.scalars())
 

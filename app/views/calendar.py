@@ -17,12 +17,16 @@ router = APIRouter()
 async def fetch_user_calendars(
     # current_user: schemas.UserProfile = Depends(deps.current_user),
     user_id: int,
+    year: int | None = None,
+    month: int | None = None,
     offset: int = 0,
     limit: int = 10,
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> list[schemas.CalendarOutput]:
     """유저의 모든 캘린더를 가져옵니다."""
-    calendars = await calendar_service.fetch_user_calendars(user_id, offset, limit)
+    calendars = await calendar_service.fetch_user_calendars(
+        user_id, year, month, offset, limit
+    )
     return calendars
 
 
@@ -81,7 +85,7 @@ async def fetch_calendar(
 @router.get(
     "/contacts/{contact_id}/calendars/{calendar_id}",
     status_code=HTTP_200_OK,
-    response_model=None,
+    response_model=schemas.CalendarOutput,
 )
 async def get_calendar(
     # current_user: schemas.UserProfile = Depends(deps.current_user),
