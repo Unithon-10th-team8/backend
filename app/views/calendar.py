@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/users/{user_id}/calendars",
+    "/calendars",
     status_code=HTTP_200_OK,
     response_model=list[schemas.CalendarOutput],
 )
