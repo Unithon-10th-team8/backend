@@ -159,7 +159,7 @@ class CalendarInput(BaseModel):
         examples=[["태그1", "태그2"]],
         default=None,
     )
-    recurring_input: CalendarRecurringInput
+    recurring_input: CalendarRecurringInput | None = None
 
 
 class ContactOutput(BaseModel):
