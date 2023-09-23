@@ -52,7 +52,7 @@ async def social_login_callback(
     provider: Literal["kakao", "google"],
     code: str,
     user_service: UserService = Depends(deps.user_service),
-) -> schemas.UserProfile:
+) -> RedirectResponse:
     """소셜 로그인을 합니다."""
     if provider == "kakao":
         raise ValidationError("아직 구현되지 않은 소셜 플랫폼입니다. 'kakao'")
@@ -70,6 +70,18 @@ async def social_login_callback(
     login(response, user)
 
     return response
+
+
+@router.get(
+    "/users/logout",
+    status_code=HTTP_204_NO_CONTENT,
+    response_class=RedirectResponse
+)
+async def logout(response: Response) -> RedirectResponse:
+    """로그아웃합니다."""
+    response.delete_cookie("access_token", domain="haenu.dev", path="/")
+    response.delete_cookie("refresh_token", domain="haenu.dev", path="/")
+    return RedirectResponse(url=config.frontend_url)
 
 
 @router.get(
