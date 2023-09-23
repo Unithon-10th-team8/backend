@@ -26,6 +26,17 @@ class CalendarService:
             schemas.CalendarOutput.model_validate(calendar) for calendar in calendars
         ]
 
+    async def fetch_user_calendars(
+        self, user_id: int, offset: int, limit: int
+    ) -> list[schemas.CalendarOutput]:
+        """유저의 모든 일정을 조회합니다."""
+        calendars = await self._calendar_repo.fetch_user_calendars(
+            user_id, offset, limit
+        )
+        return [
+            schemas.CalendarOutput.model_validate(calendar) for calendar in calendars
+        ]
+
     async def create(
         self, contact_id: UUID, calendar_input: schemas.CalendarInput
     ) -> schemas.CalendarOutput:

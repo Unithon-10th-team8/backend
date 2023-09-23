@@ -37,6 +37,24 @@ class CalendarRepository:
         res = await self._session.execute(query)
         return list(res.scalars())
 
+    async def fetch_user_calendars(
+        self, user_id: int, offset: int, limit: int
+    ) -> list[orm.Calendar]:
+        query = (
+            sa.select(orm.Calendar)
+            .join(orm.Contact)
+            .where(
+                sa.and_(
+                    orm.Contact.user_id == user_id,
+                    orm.Calendar.deleted_at.is_(None),
+                )
+            )
+            .offset(offset)
+            .limit(limit)
+        )
+        res = await self._session.execute(query)
+        return list(res.scalars())
+
     async def create(self, calendar: orm.Calendar) -> orm.Calendar:
         self._session.add(calendar)
         await self._session.flush()

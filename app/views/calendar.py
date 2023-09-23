@@ -10,6 +10,23 @@ router = APIRouter()
 
 
 @router.get(
+    "/users/{user_id}/calendars",
+    status_code=HTTP_200_OK,
+    response_model=list[schemas.CalendarOutput],
+)
+async def fetch_user_calendars(
+    # current_user: schemas.UserProfile = Depends(deps.current_user),
+    user_id: int,
+    offset: int = 0,
+    limit: int = 10,
+    calendar_service: CalendarService = Depends(deps.calendar_service),
+) -> list[schemas.CalendarOutput]:
+    """유저의 모든 캘린더를 가져옵니다."""
+    calendars = await calendar_service.fetch_user_calendars(user_id, offset, limit)
+    return calendars
+
+
+@router.get(
     "/contacts/{contact_id}/calendars",
     status_code=HTTP_200_OK,
     response_model=list[schemas.CalendarOutput],
@@ -21,7 +38,7 @@ async def fetch_calendar(
     offset: int = 0,
     limit: int = 100,
 ) -> list[schemas.CalendarOutput]:
-    """복수 연락처를 조회합니다."""
+    """복수 캘린더를 조회합니다."""
     calendar = await calendar_service.fetch(contact_id, offset=offset, limit=limit)
     return calendar
 
@@ -37,7 +54,7 @@ async def get_calendar(
     calendar_id: UUID,
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
-    """연락처를 조회합니다."""
+    """캘린더를 조회합니다."""
     calendar = await calendar_service.get(calendar_id)
     return calendar
 
@@ -53,6 +70,7 @@ async def create_calendar(
     calendar_input: schemas.CalendarInput,
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
+    """캘린더를 생성합니다."""
     calendar = await calendar_service.create(contact_id, calendar_input)
     return calendar
 
@@ -69,6 +87,7 @@ async def update_calendar(
     calendar_input: schemas.CalendarInput,
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
+    """캘린더를 수정합니다."""
     calendar = await calendar_service.update(calendar_id, calendar_input)
     return calendar
 
@@ -84,4 +103,5 @@ async def delete_calendar(
     calendar_id: UUID,
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> None:
+    """캘린더를 삭제합니다."""
     await calendar_service.delete(calendar_id)
