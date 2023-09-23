@@ -2,11 +2,11 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 
-def tz_now(tz: str = "Asia/Seoul") -> datetime:
+def tz_now(tz: str = "UTC") -> datetime:
     """타임존이 포함된 현재시간을 반환합니다.
 
     Args:
-        tz: 타임존(기본값:Asia/Seoul)
+        tz: 타임존(기본값:UTC)
 
     Returns:
         타임존이 포함된 현재시간.
@@ -28,12 +28,12 @@ def datetime_to_msepoch(dt: datetime) -> int:
     return int(dt.timestamp() * 1000)
 
 
-def msepoch_to_datetime(ms: float, tz: str = "Asia/Seoul") -> datetime:
+def msepoch_to_datetime(ms: float, tz: str = "UTC") -> datetime:
     """Millisecond Epoch를 Aware Datetime객체로 변환합니다.
 
     Args:
         ms: millisecond epoch
-        tz: 타임존(기본값:Asia/Seoul)
+        tz: 타임존(기본값:UTC)
 
     Returns:
         Aware Datetime객체

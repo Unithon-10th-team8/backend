@@ -22,6 +22,15 @@ class User(TimestampBase):
     email: Mapped[str] = mapped_column(
         sa.Text, nullable=True, default=None
     )  # 이메일이 null 이라면 필수로 받아야 함.
+    profile_image_url: Mapped[str] = mapped_column(
+        sa.Text, nullable=True, server_default=None
+    )
+    google_access_token: Mapped[str] = mapped_column(
+        sa.Text, nullable=False, server_default=""
+    )
+    google_refresh_token: Mapped[str] = mapped_column(
+        sa.Text, nullable=False, server_default=""
+    )
 
     # relationship
     contacts: Mapped[set[Contact]] = relationship(
@@ -33,6 +42,8 @@ class User(TimestampBase):
         return UserProfile(
             id=self.id,
             email=self.email,
+            name=self.name,
+            profile_image_url=self.profile_image_url,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )
@@ -66,8 +77,14 @@ class Contact(TimestampBase):
     __table_args__ = (sa.Index("contact_user_id_idx", user_id, unique=False),)
 
     # relationship
+    user: Mapped[User] = relationship("User", back_populates="contacts")
     calendars: Mapped[set[Calendar]] = relationship(
         back_populates="contact", collection_class=set
+    )
+    calendar_contacts: Mapped[set[CalendarContact]] = relationship(
+        "CalendarContact",
+        back_populates="contact",
+        collection_class=set,
     )
 
 
@@ -109,6 +126,14 @@ class Calendar(TimestampBase):
 
     __table_args__ = (sa.Index("calendar_contact_id_idx", contact_id, unique=False),)
 
+    # relationship
+    contact = relationship("Contact", back_populates="calendars")
+    calendar_contacts: Mapped[set[CalendarContact]] = relationship(
+        "CalendarContact",
+        back_populates="calendar",
+        collection_class=set,
+    )
+
 
 class CalendarRecurring(TimestampBase):
     __tablename__ = "calendar_recurring"
@@ -140,4 +165,12 @@ class CalendarContact(TimestampBase):
     )
     contact_id: Mapped[uuid.UUID] = mapped_column(
         sa.ForeignKey("contact.id"), nullable=False
+    )
+
+    # relationship
+    contact: Mapped[Contact] = relationship(
+        "Contact", back_populates="calendar_contacts"
+    )
+    calendar: Mapped[Calendar] = relationship(
+        "Calendar", back_populates="calendar_contacts"
     )
