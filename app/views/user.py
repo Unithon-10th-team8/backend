@@ -73,16 +73,15 @@ async def social_login_callback(
 @router.get(
     "/users/me",
     status_code=HTTP_200_OK,
-    response_model=None,
+    response_model=schemas.UserProfile,
 )
 async def get_me(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     user_service: UserService = Depends(deps.user_service),
-) -> None:
+) -> schemas.UserProfile:
     """내 정보를 조회합니다. (로그인 필요 후 활성화 예정)"""
-    return None
-    # user_profile = await user_service.get(current_user.id)
-    # return user_profile
+    user_profile = await user_service.get(current_user.id)
+    return user_profile
 
 
 @router.get(
