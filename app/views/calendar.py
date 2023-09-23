@@ -51,6 +51,7 @@ async def update_calendar_completion(
 )
 async def update_calendar_importance(
     calendar_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
     """일정의 '중요함' 상태를 업데이트합니다."""

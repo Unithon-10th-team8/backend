@@ -43,6 +43,7 @@ class User(TimestampBase):
             id=self.id,
             email=self.email,
             name=self.name,
+            profile_image_url=self.profile_image_url,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )
