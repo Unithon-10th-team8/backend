@@ -1,3 +1,5 @@
+from app.repositories.calendar import CalendarRepository
+from app.services.calendar import CalendarService
 from app.services.contact import ContactService
 from fastapi import Cookie, Depends, Request
 
@@ -53,3 +55,13 @@ def contact_service(
     contact_repo: ContactRepository = Depends(contact_repo),
 ) -> ContactService:
     return ContactService(contact_repo)
+
+
+def calendar_repo(session: AsyncSession = Depends(session)) -> CalendarRepository:
+    return CalendarRepository(session)
+
+
+def calendar_service(
+    calendar_repo: CalendarRepository = Depends(calendar_repo),
+) -> CalendarService:
+    return CalendarService(calendar_repo)

@@ -23,11 +23,6 @@ class ContactRepository:
         res = await self._session.execute(query)
         return res.scalar()
 
-    async def get_by_uid(self, uid: str) -> orm.Contact:
-        query = sa.select(orm.Contact).where(orm.Contact.uid == uid)
-        res = await self._session.execute(query)
-        return res.scalar()
-
     async def fetch(self, user_id: int, offset: int, limit: int) -> list[orm.Contact]:
         query = (
             sa.select(orm.Contact)

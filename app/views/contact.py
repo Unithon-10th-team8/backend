@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
-from starlette.status import HTTP_200_OK
+from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 
 from app import deps, schemas
 from app.services.contact import ContactService
@@ -73,7 +73,7 @@ async def update_contact(
 
 @router.delete(
     "/contacts/{contact_id}",
-    status_code=HTTP_200_OK,
+    status_code=HTTP_204_NO_CONTENT,
     response_model=None,
 )
 async def delete_contact(

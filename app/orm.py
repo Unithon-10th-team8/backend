@@ -58,7 +58,9 @@ class Contact(TimestampBase):
     is_important: Mapped[bool] = mapped_column(
         sa.Boolean, nullable=False, default=False
     )
-    repeat_interval: Mapped[str] = mapped_column(sa.Text, nullable=True, default=None)
+    repeat_interval: Mapped[int] = mapped_column(
+        sa.Integer, nullable=True, default=None
+    )
     repeat_base_date: Mapped[datetime] = mapped_column(
         sa.DateTime(timezone=True), nullable=True, default=None
     )

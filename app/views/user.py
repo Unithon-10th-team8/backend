@@ -1,7 +1,7 @@
 from typing import Literal
 
 from fastapi import APIRouter, Body, Depends, Response
-from starlette.status import HTTP_200_OK
+from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 
 from app import deps, schemas
 from app.base.auth import login
@@ -86,7 +86,7 @@ async def update_user(
 
 @router.delete(
     "/users/{user_id}",
-    status_code=HTTP_200_OK,
+    status_code=HTTP_204_NO_CONTENT,
 )
 async def delete_user(
     user_id: int,
