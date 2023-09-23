@@ -33,6 +33,7 @@ class User(TimestampBase):
         return UserProfile(
             id=self.id,
             email=self.email,
+            name=self.name,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )
@@ -66,6 +67,7 @@ class Contact(TimestampBase):
     __table_args__ = (sa.Index("contact_user_id_idx", user_id, unique=False),)
 
     # relationship
+    user: Mapped[User] = relationship("User", back_populates="contacts")
     calendars: Mapped[set[Calendar]] = relationship(
         back_populates="contact", collection_class=set
     )
@@ -108,6 +110,9 @@ class Calendar(TimestampBase):
     )
 
     __table_args__ = (sa.Index("calendar_contact_id_idx", contact_id, unique=False),)
+
+    # relationship
+    contact = relationship("Contact", back_populates="calendars")
 
 
 class CalendarRecurring(TimestampBase):

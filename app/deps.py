@@ -2,7 +2,7 @@ from fastapi import Cookie, Depends, Request
 
 from app.base.auth import decode_token
 from app.repositories.user import UserRepository
-from app.schemas import User
+from app.schemas import UserProfile
 from app.services.user import UserService
 from app.exceptions import NotFoundError, PermissionError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 async def current_user(
     access_token: str = Cookie(default=None),
     refresh_token: str = Cookie(default=None),
-) -> User:
+) -> UserProfile:
     if access_token and refresh_token:
         try:
             result = decode_token(access_token)
