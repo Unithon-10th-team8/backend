@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 import uuid
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -9,7 +10,7 @@ class UserProfile(BaseModel):
     id: int = Field(description="유저 아이디", examples=[1])
     name: str = Field(description="이름", examples=["홍길동"])
     email: str = Field(description="이메일", examples=["user@email.com"])
-    profile_image_url: str | None = Field(
+    profile_image_url: Any = Field(
         description="프로필 이미지 URL",
         examples=["https://www.google.com"],
         default=None,
