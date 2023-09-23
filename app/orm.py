@@ -79,7 +79,7 @@ class Calendar(TimestampBase):
     )
     name: Mapped[str] = mapped_column(sa.String(100), nullable=False)
     start_dt: Mapped[datetime] = mapped_column(
-        sa.DateTime(timezone=True), nullable=True, default=None
+        sa.DateTime(timezone=True), nullable=False
     )
     end_dt: Mapped[datetime] = mapped_column(
         sa.DateTime(timezone=True), nullable=True, default=None
@@ -87,7 +87,7 @@ class Calendar(TimestampBase):
     is_all_day: Mapped[bool] = mapped_column(sa.Boolean, nullable=True, default=None)
     remind_interval: Mapped[int] = mapped_column(
         sa.Integer, nullable=True, default=None
-    )
+    )  # 분 단위
     is_important: Mapped[bool] = mapped_column(
         sa.Boolean, nullable=False, default=False
     )
@@ -107,13 +107,7 @@ class Calendar(TimestampBase):
         sa.ForeignKey("contact.id"), nullable=False
     )
 
-    __table_args__ = (
-        sa.CheckConstraint(
-            "(start_dt IS NOT NULL) OR (is_all_day IS NOT NULL)",
-            name="check_start_or_all_day",
-        ),
-        sa.Index("calendar_contact_id_idx", contact_id, unique=False),
-    )
+    __table_args__ = (sa.Index("calendar_contact_id_idx", contact_id, unique=False),)
 
 
 class CalendarRecurring(TimestampBase):

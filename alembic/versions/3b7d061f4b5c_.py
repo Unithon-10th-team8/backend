@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: b429222469a3
+Revision ID: 3b7d061f4b5c
 Revises: d3c879ac3509
-Create Date: 2023-09-23 14:10:21.213738
+Create Date: 2023-09-23 14:23:09.531711
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "b429222469a3"
+revision: str = "3b7d061f4b5c"
 down_revision: Union[str, None] = "d3c879ac3509"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -92,7 +92,7 @@ def upgrade() -> None:
         "calendar",
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("name", sa.String(length=100), nullable=False),
-        sa.Column("start_dt", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("start_dt", sa.DateTime(timezone=True), nullable=False),
         sa.Column("end_dt", sa.DateTime(timezone=True), nullable=True),
         sa.Column("is_all_day", sa.Boolean(), nullable=True),
         sa.Column("remind_interval", sa.Integer(), nullable=True),
@@ -117,10 +117,6 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
-        sa.CheckConstraint(
-            "(start_dt IS NOT NULL) OR (is_all_day IS NOT NULL)",
-            name="check_start_or_all_day",
-        ),
         sa.ForeignKeyConstraint(
             ["calendar_recurring_id"],
             ["calendar_recurring.id"],
