@@ -1,4 +1,5 @@
 from app import schemas
+from app.exceptions import NotFoundError
 from app.orm import User
 from app.repositories.user import UserRepository
 
@@ -15,3 +16,27 @@ class UserService:
         else:
             user = await self._user_repo.create(User(uid=uid, provider=provider))
             return user.profile
+
+    async def get(self, user_id: int) -> schemas.UserProfile:
+        """유저를 조회합니다."""
+        user = await self._user_repo.get(user_id)
+        return user.profile
+
+    async def fetch(self, offset: int, limit: int) -> list[schemas.UserProfile]:
+        """복수 유저를 조회합니다."""
+        users = await self._user_repo.fetch(offset, limit)
+        return [user.profile for user in users]
+
+    async def update(
+        self, user_id: int, user_input: schemas.UserInput
+    ) -> schemas.UserProfile:
+        """유저를 수정합니다."""
+        user = await self._user_repo.update(user_id, user_input)
+        if user is None:
+            raise NotFoundError("유저가 존재하지 않습니다.")
+
+        return user.profile
+
+    async def delete(self, user_id: int) -> None:
+        """유저를 삭제합니다."""
+        await self._user_repo.delete(user_id)
