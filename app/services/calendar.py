@@ -3,6 +3,7 @@ from app import schemas
 from app.exceptions import NotFoundError, ValidationError
 from app import orm
 from app.repositories.calendar import CalendarRepository
+from dateutil import rrule
 import logging
 
 # 로깅 설정 (출력 레벨은 DEBUG)
@@ -49,41 +50,72 @@ class CalendarService:
 
     async def create(
         self, user_id: int, contact_id: UUID, calendar_input: schemas.CalendarInput
-    ) -> schemas.CalendarOutput:
+    ) -> None:
         """복수 일정을 조회합니다."""
         if calendar_input.is_repeat:
             if not calendar_input.recurring_input:
                 raise ValidationError("반복 설정이 필요합니다.")
             try:
+                # 반복 주기와 간격을 기반으로 반복 일정을 생성합니다.
                 recurring = await self._calendar_repo.create_recurring(
                     orm.CalendarRecurring(
                         **calendar_input.recurring_input.model_dump(), user_id=user_id
                     )
                 )
+                freq_map = {
+                    "일": rrule.DAILY,
+                    "주": rrule.WEEKLY,
+                    "월": rrule.MONTHLY,
+                    "년": rrule.YEARLY,
+                }
+                start_dt = max(recurring.start_dt, calendar_input.start_dt)
+
+                r = rrule.rrule(
+                    freq=freq_map[recurring.frequency],
+                    interval=recurring.interval,
+                    dtstart=start_dt,
+                    until=recurring.end_dt,
+                )
+
+                for dt in r:
+                    calendar = orm.Calendar(
+                        start_dt=dt,
+                        name=calendar_input.name,
+                        end_dt=calendar_input.end_dt,
+                        content=calendar_input.content,
+                        is_all_day=calendar_input.is_all_day,
+                        is_repeat=calendar_input.is_repeat,
+                        is_complete=calendar_input.is_complete,
+                        is_important=calendar_input.is_important,
+                        remind_interval=calendar_input.remind_interval,
+                        completed_at=calendar_input.completed_at,
+                        tags=calendar_input.tags,
+                        contact_id=contact_id,
+                        calendar_recurring_id=recurring.id,
+                    )
+                    await self._calendar_repo.create(contact_id, calendar)
+
             except Exception as e:
                 logging.debug(f"반복 설정 생성 실패 {e}")
                 raise ValidationError("반복 설정이 잘못되었습니다.")
         else:
-            recurring = None
+            calendar = orm.Calendar(
+                name=calendar_input.name,
+                start_dt=calendar_input.start_dt,
+                end_dt=calendar_input.end_dt,
+                content=calendar_input.content,
+                is_all_day=calendar_input.is_all_day,
+                is_repeat=calendar_input.is_repeat,
+                is_complete=calendar_input.is_complete,
+                is_important=calendar_input.is_important,
+                remind_interval=calendar_input.remind_interval,
+                completed_at=calendar_input.completed_at,
+                tags=calendar_input.tags,
+                contact_id=contact_id,
+                calendar_recurring_id=None,
+            )
 
-        calendar = orm.Calendar(
-            name=calendar_input.name,
-            start_dt=calendar_input.start_dt,
-            end_dt=calendar_input.end_dt,
-            content=calendar_input.content,
-            is_all_day=calendar_input.is_all_day,
-            is_repeat=calendar_input.is_repeat,
-            is_complete=calendar_input.is_complete,
-            is_important=calendar_input.is_important,
-            remind_interval=calendar_input.remind_interval,
-            completed_at=calendar_input.completed_at,
-            tags=calendar_input.tags,
-            contact_id=contact_id,
-            calendar_recurring_id=recurring.id if recurring else None,
-        )
-
-        calendar = await self._calendar_repo.create(contact_id, calendar)
-        return schemas.CalendarOutput.model_validate(calendar)
+            calendar = await self._calendar_repo.create(contact_id, calendar)
 
     async def update(
         self, calendar_id: UUID, calendar_input: schemas.CalendarInput

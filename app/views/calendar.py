@@ -95,19 +95,16 @@ async def get_calendar(
 @router.post(
     "/contacts/{contact_id}/calendars",
     status_code=HTTP_200_OK,
-    response_model=schemas.CalendarOutput,
+    response_model=None,
 )
 async def create_calendar(
     contact_id: UUID,
     calendar_input: schemas.CalendarInput,
     current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
-) -> schemas.CalendarOutput:
-    """캘린더를 생성합니다. 반복 설정을 할 경우 recurring_input 의 값을 모두 채워주세요."""  # noqa
-    calendar = await calendar_service.create(
-        current_user.id, contact_id, calendar_input
-    )
-    return calendar
+) -> None:
+    """캘린더를 생성하며 반환 값은 null 입니다. 반복 설정을 할 경우 recurring_input 의 값을 모두 채워주세요."""  # noqa
+    await calendar_service.create(current_user.id, contact_id, calendar_input)
 
 
 @router.post(

@@ -3,10 +3,9 @@ from __future__ import annotations
 import datetime
 from typing import Any
 import uuid
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, validator
 from app.enum import (
     CalendarRecurringFrequencyEnum,
-    CalendarRecurringIntervalEnum,
     ContactCategoryEnum,
     ContactRepeatIntervalEnum,
 )
@@ -96,16 +95,23 @@ class CalendarRecurringInput(BaseModel):
         examples=[tz_now()],
         default=None,
     )
-    interval: CalendarRecurringIntervalEnum = Field(
-        description="반복 간격(개월)",
-        examples=[1, 3, 6, 12],
+    interval: int = Field(
+        description="반복 간격",
+        examples=[1],
         default=None,
     )
     frequency: CalendarRecurringFrequencyEnum = Field(
         description="반복 주기",
-        examples=["일", "주", "월", "년"],
+        examples=["일"],
         default=None,
     )
+
+    @validator("interval", pre=True, always=True)
+    def validate_interval(cls, value):
+        if value < 1:
+            raise ValueError("interval이 1 이상 이어야 합니다.")
+
+        return value
 
 
 class CalendarInput(BaseModel):
@@ -295,12 +301,12 @@ class CalendarRecurringOutput(BaseModel):
         examples=[tz_now()],
     )
     interval: int = Field(
-        description="반복 간격(개월)",
-        examples=[1, 3, 6, 12],
+        description="반복 간격",
+        examples=[1],
     )
-    frequency: str = Field(
+    frequency: CalendarRecurringFrequencyEnum = Field(
         description="반복 주기",
-        examples=["일", "월", "년"],
+        examples=["일"],
     )
 
     model_config = ConfigDict(from_attributes=True)

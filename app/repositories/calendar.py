@@ -89,7 +89,9 @@ class CalendarRepository:
         await self._session.flush()
         return calendar
 
-    async def create_recurring(self, recurring: orm.CalendarRecurring) -> orm.Calendar:
+    async def create_recurring(
+        self, recurring: orm.CalendarRecurring
+    ) -> orm.CalendarRecurring:
         self._session.add(recurring)
         await self._session.flush()
 

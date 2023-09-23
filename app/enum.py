@@ -1,4 +1,4 @@
-from enum import IntEnum, StrEnum
+from enum import StrEnum
 
 
 class ContactCategoryEnum(StrEnum):
@@ -13,13 +13,6 @@ class ContactRepeatIntervalEnum(StrEnum):
     THREE = "3"
     SIX = "6"
     TWELVE = "12"
-
-
-class CalendarRecurringIntervalEnum(IntEnum):
-    ONE = 1
-    THREE = 3
-    SIX = 6
-    TWELVE = 12
 
 
 class CalendarRecurringFrequencyEnum(StrEnum):
