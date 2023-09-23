@@ -118,7 +118,7 @@ async def create_calendar(
     current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
-    """캘린더를 생성하며 반환 값은 null 입니다. 반복 설정을 할 경우 recurring_input 의 값을 모두 채워주세요."""  # noqa
+    """캘린더를 생성합니다. 반복 설정을 할 경우 recurring_input 의 값을 모두 채워주세요."""  # noqa
     calendar = await calendar_service.create(
         current_user.id, contact_id, calendar_input
     )
