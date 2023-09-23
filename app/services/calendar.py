@@ -50,7 +50,7 @@ class CalendarService:
 
     async def create(
         self, user_id: int, contact_id: UUID, calendar_input: schemas.CalendarInput
-    ) -> None:
+    ) -> schemas.CalendarOutput:
         """복수 일정을 조회합니다."""
         if calendar_input.is_repeat:
             if not calendar_input.recurring_input:
@@ -77,6 +77,7 @@ class CalendarService:
                     until=recurring.end_dt,
                 )
 
+                calendars: list[orm.Calendar] = []
                 for dt in r:
                     calendar = orm.Calendar(
                         start_dt=dt,
@@ -93,7 +94,11 @@ class CalendarService:
                         contact_id=contact_id,
                         calendar_recurring_id=recurring.id,
                     )
-                    await self._calendar_repo.create(contact_id, calendar)
+                    calendar = await self._calendar_repo.create(contact_id, calendar)
+                    calendars.append(calendar)
+
+                # 반복 일정을 생성했을 경우 첫번째 생성된 일정만 반환합니다.
+                return calendars[0]
 
             except Exception as e:
                 logging.debug(f"반복 설정 생성 실패 {e}")
@@ -116,6 +121,7 @@ class CalendarService:
             )
 
             calendar = await self._calendar_repo.create(contact_id, calendar)
+            return calendar
 
     async def update(
         self, calendar_id: UUID, calendar_input: schemas.CalendarInput
