@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import orm
 from app.schemas import ContactInput
 from app.utils import tz_now
+from sqlalchemy.orm import selectinload
 
 
 class ContactRepository:
@@ -12,8 +13,12 @@ class ContactRepository:
         self._session = session
 
     async def get(self, contact_id: UUID) -> orm.Contact:
-        query = sa.select(orm.Contact).where(
-            sa.and_(orm.Contact.id == contact_id, orm.Contact.deleted_at.is_(None))
+        query = (
+            sa.select(orm.Contact)
+            .where(
+                sa.and_(orm.Contact.id == contact_id, orm.Contact.deleted_at.is_(None))
+            )
+            .options(selectinload(orm.Contact.calendars))
         )
         res = await self._session.execute(query)
         return res.scalar()
