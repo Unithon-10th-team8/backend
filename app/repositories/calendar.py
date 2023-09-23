@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import orm
 from app.schemas import CalendarInput
 from app.utils import tz_now
+from sqlalchemy.orm import subqueryload
 
 
 class CalendarRepository:
@@ -13,10 +14,19 @@ class CalendarRepository:
         self._session = session
 
     async def get(self, calendar_id: UUID) -> orm.Calendar:
-        query = sa.select(orm.Calendar).where(
-            sa.and_(
-                orm.Calendar.id == calendar_id, orm.Calendar.deleted_at.is_(None)
-            )  # TODO: 연락처 중간 테이블로 조인하기
+        """일정을 조회합니다."""
+        query = (
+            sa.select(orm.Calendar)
+            .options(
+                subqueryload(orm.Calendar.calendar_contacts).joinedload(
+                    orm.CalendarContact.contact
+                )
+            )
+            .where(
+                sa.and_(
+                    orm.Calendar.id == calendar_id, orm.Calendar.deleted_at.is_(None)
+                )
+            )
         )
         res = await self._session.execute(query)
         return res.scalar()
@@ -34,6 +44,7 @@ class CalendarRepository:
             )
             .offset(offset)
             .limit(limit)
+            .order_by(orm.Calendar.start_dt.asc())
         )
         res = await self._session.execute(query)
         return list(res.scalars())
@@ -62,12 +73,18 @@ class CalendarRepository:
         if month is not None:
             query = query.where(sa.extract("month", orm.Calendar.start_dt) == month)
 
-        query = query.offset(offset).limit(limit)
+        query = query.offset(offset).limit(limit).order_by(orm.Calendar.start_dt.asc())
         res = await self._session.execute(query)
         return list(res.scalars())
 
-    async def create(self, calendar: orm.Calendar) -> orm.Calendar:
+    async def create(self, contact_id: UUID, calendar: orm.Calendar) -> orm.Calendar:
         self._session.add(calendar)
+        await self._session.flush()
+
+        calendar_contact = orm.CalendarContact(
+            contact_id=contact_id, calendar_id=calendar.id
+        )
+        self._session.add(calendar_contact)
         await self._session.flush()
         return calendar
 

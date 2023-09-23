@@ -22,11 +22,11 @@ class User(TimestampBase):
     email: Mapped[str] = mapped_column(
         sa.Text, nullable=True, default=None
     )  # 이메일이 null 이라면 필수로 받아야 함.
-    profile_image_url: Mapped[str] = mapped_column(
-        sa.Text, nullable=True, default=None
-    )
+    profile_image_url: Mapped[str] = mapped_column(sa.Text, nullable=True, default=None)
     google_access_token: Mapped[str] = mapped_column(sa.Text, nullable=False)
-    google_refresh_token: Mapped[str] = mapped_column(sa.Text, nullable=False, default=None)
+    google_refresh_token: Mapped[str] = mapped_column(
+        sa.Text, nullable=False, default=None
+    )
 
     # relationship
     contacts: Mapped[set[Contact]] = relationship(
@@ -76,6 +76,11 @@ class Contact(TimestampBase):
     calendars: Mapped[set[Calendar]] = relationship(
         back_populates="contact", collection_class=set
     )
+    calendar_contacts: Mapped[set[CalendarContact]] = relationship(
+        "CalendarContact",
+        back_populates="contact",
+        collection_class=set,
+    )
 
 
 class Calendar(TimestampBase):
@@ -118,6 +123,11 @@ class Calendar(TimestampBase):
 
     # relationship
     contact = relationship("Contact", back_populates="calendars")
+    calendar_contacts: Mapped[set[CalendarContact]] = relationship(
+        "CalendarContact",
+        back_populates="calendar",
+        collection_class=set,
+    )
 
 
 class CalendarRecurring(TimestampBase):
@@ -150,4 +160,12 @@ class CalendarContact(TimestampBase):
     )
     contact_id: Mapped[uuid.UUID] = mapped_column(
         sa.ForeignKey("contact.id"), nullable=False
+    )
+
+    # relationship
+    contact: Mapped[Contact] = relationship(
+        "Contact", back_populates="calendar_contacts"
+    )
+    calendar: Mapped[Calendar] = relationship(
+        "Calendar", back_populates="calendar_contacts"
     )

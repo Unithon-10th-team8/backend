@@ -33,6 +33,7 @@ class ContactRepository:
             )
             .offset(offset)
             .limit(limit)
+            .order_by(orm.Contact.updated_at.desc())
         )
         res = await self._session.execute(query)
         return list(res.scalars())

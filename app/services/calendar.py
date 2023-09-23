@@ -43,7 +43,7 @@ class CalendarService:
         """복수 일정을 조회합니다."""
         # TODO: 반복일정 생성 추가
         calendar = orm.Calendar(**calendar_input.model_dump(), contact_id=contact_id)
-        calendar = await self._calendar_repo.create(calendar)
+        calendar = await self._calendar_repo.create(contact_id, calendar)
         return schemas.CalendarOutput.model_validate(calendar)
 
     async def update(
