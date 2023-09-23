@@ -10,36 +10,58 @@ router = APIRouter()
 
 
 @router.get(
-    "/users/{user_id}/calendars",
+    "/calendars",
     status_code=HTTP_200_OK,
     response_model=list[schemas.CalendarOutput],
 )
 async def fetch_user_calendars(
     # current_user: schemas.UserProfile = Depends(deps.current_user),
     user_id: int,
+    year: int | None = None,
+    month: int | None = None,
     offset: int = 0,
     limit: int = 10,
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> list[schemas.CalendarOutput]:
     """유저의 모든 캘린더를 가져옵니다."""
-    calendars = await calendar_service.fetch_user_calendars(user_id, offset, limit)
+    calendars = await calendar_service.fetch_user_calendars(
+        user_id, year, month, offset, limit
+    )
     return calendars
 
 
-# 완료여부 변경
 @router.post(
-    "/calendars/{calendar_id}",
+    "/calendars/{calendar_id}/completion",
     status_code=HTTP_200_OK,
     response_model=schemas.CalendarOutput,
 )
-async def update_calendar_is_complete(
+async def update_calendar_completion(
     # current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_id: UUID,
     is_complete: bool = Body(..., embed=True),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
     """일정을 완료 처리합니다."""
-    calendar = await calendar_service.update_is_complete(calendar_id, is_complete)
+    calendar = await calendar_service.update_calendar_completion(
+        calendar_id, is_complete
+    )
+    return calendar
+
+
+@router.post(
+    "/calendars/{calendar_id}/importance",
+    status_code=HTTP_200_OK,
+    response_model=schemas.CalendarOutput,
+)
+async def update_calendar_importance(
+    calendar_id: UUID,
+    is_important: bool = Body(..., embed=True),
+    calendar_service: CalendarService = Depends(deps.calendar_service),
+) -> schemas.CalendarOutput:
+    """일정의 '중요함' 상태를 업데이트합니다."""
+    calendar = await calendar_service.update_calendar_importance(
+        calendar_id, is_important
+    )
     return calendar
 
 
@@ -63,7 +85,7 @@ async def fetch_calendar(
 @router.get(
     "/contacts/{contact_id}/calendars/{calendar_id}",
     status_code=HTTP_200_OK,
-    response_model=None,
+    response_model=schemas.CalendarOutput,
 )
 async def get_calendar(
     # current_user: schemas.UserProfile = Depends(deps.current_user),

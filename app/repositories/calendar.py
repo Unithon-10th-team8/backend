@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,7 +39,7 @@ class CalendarRepository:
         return list(res.scalars())
 
     async def fetch_user_calendars(
-        self, user_id: int, offset: int, limit: int
+        self, user_id: int, year: int | None, month: int | None, offset: int, limit: int
     ) -> list[orm.Calendar]:
         query = (
             sa.select(orm.Calendar)
@@ -49,9 +50,19 @@ class CalendarRepository:
                     orm.Calendar.deleted_at.is_(None),
                 )
             )
-            .offset(offset)
-            .limit(limit)
         )
+
+        # year가 None인 경우, 올해 연도로 설정
+        if year is None:
+            year = datetime.now().year
+
+        query = query.where(sa.extract("year", orm.Calendar.start_dt) == year)
+
+        # month가 주어진 경우, 쿼리에 추가
+        if month is not None:
+            query = query.where(sa.extract("month", orm.Calendar.start_dt) == month)
+
+        query = query.offset(offset).limit(limit)
         res = await self._session.execute(query)
         return list(res.scalars())
 
@@ -84,7 +95,7 @@ class CalendarRepository:
         )
         return updated_calendar.scalar_one_or_none()
 
-    async def update_is_complete(
+    async def update_calendar_completion(
         self, calendar_id: UUID, is_complete: bool
     ) -> orm.Calendar:
         query = (
@@ -96,6 +107,30 @@ class CalendarRepository:
                 )
             )
             .values(is_complete=is_complete)
+        )
+        await self._session.execute(query)
+        await self._session.flush()
+        updated_calendar = await self._session.execute(
+            sa.select(orm.Calendar).where(
+                sa.and_(
+                    orm.Calendar.id == calendar_id, orm.Calendar.deleted_at.is_(None)
+                )
+            )
+        )
+        return updated_calendar.scalar_one_or_none()
+
+    async def update_calendar_importance(
+        self, calendar_id: UUID, is_important: bool
+    ) -> orm.Calendar:
+        query = (
+            sa.update(orm.Calendar)
+            .where(
+                sa.and_(
+                    orm.Calendar.id == calendar_id,
+                    orm.Calendar.deleted_at.is_(None),
+                )
+            )
+            .values(is_important=is_important)
         )
         await self._session.execute(query)
         await self._session.flush()

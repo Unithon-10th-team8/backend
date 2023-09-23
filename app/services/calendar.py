@@ -27,11 +27,11 @@ class CalendarService:
         ]
 
     async def fetch_user_calendars(
-        self, user_id: int, offset: int, limit: int
+        self, user_id: int, year: int | None, month: int | None, offset: int, limit: int
     ) -> list[schemas.CalendarOutput]:
         """유저의 모든 일정을 조회합니다."""
         calendars = await self._calendar_repo.fetch_user_calendars(
-            user_id, offset, limit
+            user_id, year, month, offset, limit
         )
         return [
             schemas.CalendarOutput.model_validate(calendar) for calendar in calendars
@@ -60,12 +60,24 @@ class CalendarService:
         """일정을 삭제합니다."""
         await self._calendar_repo.delete(calendar_id)
 
-    async def update_is_complete(
+    async def update_calendar_completion(
         self, calendar_id: UUID, is_complete: bool
     ) -> schemas.CalendarOutput:
-        """일정을 수정합니다."""
-        calendar = await self._calendar_repo.update_is_complete(
+        """일정 완료 여부를 수정합니다."""
+        calendar = await self._calendar_repo.update_calendar_completion(
             calendar_id, is_complete
+        )
+        if calendar is None:
+            raise NotFoundError("일정이 존재하지 않습니다.")
+
+        return schemas.CalendarOutput.model_validate(calendar)
+
+    async def update_calendar_importance(
+        self, calendar_id: UUID, is_important: bool
+    ) -> schemas.CalendarOutput:
+        """일정 중요여부를 수정합니다."""
+        calendar = await self._calendar_repo.update_calendar_importance(
+            calendar_id, is_important
         )
         if calendar is None:
             raise NotFoundError("일정이 존재하지 않습니다.")
