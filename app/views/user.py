@@ -45,6 +45,7 @@ async def social_login(
     "/social-login/{provider}/callback",
     status_code=HTTP_200_OK,
     response_model=schemas.UserProfile,
+    response_class=RedirectResponse,
 )
 async def social_login_callback(
     response: Response,
@@ -64,9 +65,11 @@ async def social_login_callback(
     else:
         raise ValidationError(f"지원하지 않는 소셜 플랫폼입니다. '{provider}'")
     user = await user_service.get_or_create_user(provider, user_info)
+
+    response = RedirectResponse(url=config.frontend_url)
     login(response, user)
 
-    return RedirectResponse(config.frontend_url)
+    return response
 
 
 @router.get(
