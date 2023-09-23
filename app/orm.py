@@ -39,7 +39,6 @@ class User(TimestampBase):
 
     @property
     def profile(self) -> UserProfile:
-        print(self.profile_image_url, "@@@@")
         return UserProfile(
             id=self.id,
             email=self.email,
