@@ -1,8 +1,12 @@
 from uuid import UUID
 from app import schemas
-from app.exceptions import NotFoundError
+from app.exceptions import NotFoundError, ValidationError
 from app import orm
 from app.repositories.calendar import CalendarRepository
+import logging
+
+# 로깅 설정 (출력 레벨은 DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class CalendarService:
@@ -44,11 +48,39 @@ class CalendarService:
         ]
 
     async def create(
-        self, contact_id: UUID, calendar_input: schemas.CalendarInput
+        self, user_id: int, contact_id: UUID, calendar_input: schemas.CalendarInput
     ) -> schemas.CalendarOutput:
         """복수 일정을 조회합니다."""
         # TODO: 반복일정 생성 추가
-        calendar = orm.Calendar(**calendar_input.model_dump(), contact_id=contact_id)
+        if calendar_input.is_repeat:
+            try:
+                recurring = await self._calendar_repo.create_recurring(
+                    orm.CalendarRecurring(
+                        **calendar_input.recurring_input.model_dump(), user_id=user_id
+                    )
+                )
+            except Exception as e:
+                logging.debug(f"반복 설정 생성 실패 {e}")
+                raise ValidationError("반복 설정이 잘못되었습니다.")
+        else:
+            recurring = None
+
+        calendar = orm.Calendar(
+            name=calendar_input.name,
+            start_dt=calendar_input.start_dt,
+            end_dt=calendar_input.end_dt,
+            content=calendar_input.content,
+            is_all_day=calendar_input.is_all_day,
+            is_repeat=calendar_input.is_repeat,
+            is_complete=calendar_input.is_complete,
+            is_important=calendar_input.is_important,
+            remind_interval=calendar_input.remind_interval,
+            completed_at=calendar_input.completed_at,
+            tags=calendar_input.tags,
+            contact_id=contact_id,
+            calendar_recurring_id=recurring.id if recurring else None,
+        )
+
         calendar = await self._calendar_repo.create(contact_id, calendar)
         return schemas.CalendarOutput.model_validate(calendar)
 

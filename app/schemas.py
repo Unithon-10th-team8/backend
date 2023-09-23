@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import Any
 import uuid
@@ -77,6 +79,29 @@ class ContactInput(BaseModel):
     )
 
 
+class CalendarRecurringInput(BaseModel):
+    start_dt: datetime.datetime = Field(
+        description="반복 시작일시",
+        examples=[tz_now()],
+        default=None,
+    )
+    end_dt: datetime.datetime = Field(
+        description="반복 종료일시",
+        examples=[tz_now()],
+        default=None,
+    )
+    interval: int = Field(
+        description="반복 간격(개월)",
+        examples=[1, 3, 6, 12],
+        default=None,
+    )
+    frequency: str = Field(
+        description="반복 주기",
+        examples=["일", "월", "년"],
+        default=None,
+    )
+
+
 class CalendarInput(BaseModel):
     name: str = Field(description="일정 이름", examples=["홍길동"])
     start_dt: datetime.datetime = Field(
@@ -128,25 +153,7 @@ class CalendarInput(BaseModel):
         examples=[["태그1", "태그2"]],
         default=None,
     )
-
-
-class CalendarRecurringInput(BaseModel):
-    start_dt: datetime.datetime = Field(
-        description="반복 시작일시",
-        examples=[tz_now()],
-    )
-    end_dt: datetime.datetime = Field(
-        description="반복 종료일시",
-        examples=[tz_now()],
-    )
-    interval: int = Field(
-        description="반복 간격(개월)",
-        examples=[1, 3, 6, 12],
-    )
-    frequency: str = Field(
-        description="반복 주기",
-        examples=["일", "월", "년"],
-    )
+    recurring_input: CalendarRecurringInput
 
 
 class ContactOutput(BaseModel):
