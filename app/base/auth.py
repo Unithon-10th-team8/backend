@@ -21,7 +21,7 @@ def create_token(
     payload["iss"] = issuer
     payload["iat"] = iat = tz_now()
     payload["exp"] = iat + expires_delta
-    return jwt.encode(payload, config.SECRET_KEY, algorithm=algorithm)
+    return jwt.encode(payload, config.secret_key, algorithm=algorithm)
 
 
 def decode_token(token: str, algorithm: str = "HS256") -> dict[str, Any]:
@@ -29,7 +29,7 @@ def decode_token(token: str, algorithm: str = "HS256") -> dict[str, Any]:
     options = {"verify_exp": True, "verify_iss": True}
     return jwt.decode(
         token,
-        config.SECRET_KEY,
+        config.secret_key,
         options=options,
         issuer=issuer,
         algorithms=[algorithm],
@@ -50,6 +50,7 @@ def _set_cookie(response: Response, key: str, value: str) -> None:
         key=key,
         value=value,
         max_age=60 * 60 * 24 * 30,  # 30일
+        domain=config.frontend_domain,
         httponly=True,
         secure=True,
     )

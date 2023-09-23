@@ -1,11 +1,14 @@
 from typing import Literal
 
 from fastapi import APIRouter, Body, Depends, Response
+from fastapi.responses import RedirectResponse
 from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 
 from app import deps, schemas
 from app.base.auth import login
+from app.base.config import config
 from app.base.provider import KakaoAuthProvider
+from app.base.provider import GoogleAuthProvider
 
 from app.exceptions import ValidationError
 from app.services.user import UserService
@@ -13,26 +16,58 @@ from app.services.user import UserService
 router = APIRouter()
 
 
-@router.post(
+@router.get(
     "/social-login/{provider}",
     status_code=HTTP_200_OK,
     response_model=schemas.UserProfile,
 )
 async def social_login(
+    provider: Literal["kakao", "google"],
+) -> schemas.UserProfile:
+    # redirect to kakao / google login page
+    if provider == "kakao":
+        raise ValidationError("아직 구현되지 않은 소셜 플랫폼입니다. 'kakao'")
+    elif provider == "google":
+        provider_url = "https://accounts.google.com/o/oauth2/v2/auth"
+        params = {
+            "client_id": config.google_client_id,
+            "redirect_uri": config.google_redirect_uri,
+            "response_type": "code",
+            "scope": "email profile",
+            "access_type": "offline",
+        }
+        param_string = "&".join([f"{key}={value}" for key, value in params.items()])
+        redirect_url = f"{provider_url}?{param_string}"
+
+    return RedirectResponse(redirect_url)
+
+
+@router.get(
+    "/social-login/{provider}/callback",
+    status_code=HTTP_200_OK,
+    response_model=schemas.UserProfile,
+)
+async def social_login_callback(
     response: Response,
-    provider: Literal["kakao", "apple"],
-    token: str = Body(embed=True),
+    provider: Literal["kakao", "google"],
+    code: str,
     user_service: UserService = Depends(deps.user_service),
 ) -> schemas.UserProfile:
     """소셜 로그인을 합니다."""
     if provider == "kakao":
-        kakao_provider = KakaoAuthProvider(token)
-        user_info = kakao_provider.get_user_info()
+        raise ValidationError("아직 구현되지 않은 소셜 플랫폼입니다. 'kakao'")
+        # kakao_provider = KakaoAuthProvider(token)
+        # user_info = kakao_provider.get_user_info()
+    elif provider == "google":
+        google_provider = GoogleAuthProvider(code)
+        google_provider.get_access_token()
+        user_info = google_provider.get_user_info()
     else:
         raise ValidationError(f"지원하지 않는 소셜 플랫폼입니다. '{provider}'")
-    user = await user_service.get_or_create_user(provider, user_info["uid"])
+    user = await user_service.get_or_create_user(provider, user_info)
     login(response, user)
-    return user
+
+    return RedirectResponse(config.frontend_url)
 
 
 # TODO: 로그인 구현 후 활성화
