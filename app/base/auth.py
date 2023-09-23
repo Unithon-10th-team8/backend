@@ -50,7 +50,7 @@ def _set_cookie(response: Response, key: str, value: str) -> None:
         key=key,
         value=value,
         max_age=60 * 60 * 24 * 30,  # 30일
-        domain=".haenu.dev",
+        domain="haenu.dev",
         # domain=config.frontend_domain,
         httponly=True,
         secure=True,
