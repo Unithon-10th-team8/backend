@@ -29,6 +29,21 @@ async def fetch_user_calendars(
     return calendars
 
 
+@router.get(
+    "/calendars/{calendar_id}",
+    status_code=HTTP_200_OK,
+    response_model=schemas.CalendarContactOutput,
+)
+async def get_calendar_by_calendar_id(
+    calendar_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
+    calendar_service: CalendarService = Depends(deps.calendar_service),
+) -> schemas.CalendarContactOutput:
+    """캘린더를 조회합니다. 캘린더와 관계한 연락처도 함께 조회합니다."""
+    calendar = await calendar_service.get(calendar_id)
+    return calendar
+
+
 @router.post(
     "/calendars/{calendar_id}/completion",
     status_code=HTTP_200_OK,
