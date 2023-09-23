@@ -22,10 +22,14 @@ class User(TimestampBase):
     email: Mapped[str] = mapped_column(
         sa.Text, nullable=True, default=None
     )  # 이메일이 null 이라면 필수로 받아야 함.
-    profile_image_url: Mapped[str] = mapped_column(sa.Text, nullable=True, default=None)
-    google_access_token: Mapped[str] = mapped_column(sa.Text, nullable=False)
+    profile_image_url: Mapped[str] = mapped_column(
+        sa.Text, nullable=True, server_default=None
+    )
+    google_access_token: Mapped[str] = mapped_column(
+        sa.Text, nullable=False, server_default=""
+    )
     google_refresh_token: Mapped[str] = mapped_column(
-        sa.Text, nullable=False, default=None
+        sa.Text, nullable=False, server_default=""
     )
 
     # relationship
