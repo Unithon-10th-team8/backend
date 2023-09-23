@@ -4,6 +4,12 @@ import datetime
 from typing import Any
 import uuid
 from pydantic import BaseModel, ConfigDict, Field
+from app.enum import (
+    CalendarRecurringFrequencyEnum,
+    CalendarRecurringIntervalEnum,
+    ContactCategoryEnum,
+    ContactRepeatIntervalEnum,
+)
 
 from app.utils import tz_now
 
@@ -48,7 +54,7 @@ class ContactInput(BaseModel):
         examples=["email@gmail.com"],
         default=None,
     )
-    category: str = Field(
+    category: ContactCategoryEnum = Field(
         description="카테고리",
         examples=["직장", "거래처", "고객", "기타"],
     )
@@ -67,7 +73,7 @@ class ContactInput(BaseModel):
         examples=[True],
         default=False,
     )
-    repeat_interval: str | None = Field(
+    repeat_interval: ContactRepeatIntervalEnum | None = Field(
         description="반복주기(개월)",
         examples=["1", "3", "6", "12"],
         default=None,
@@ -90,14 +96,14 @@ class CalendarRecurringInput(BaseModel):
         examples=[tz_now()],
         default=None,
     )
-    interval: int = Field(
+    interval: CalendarRecurringIntervalEnum = Field(
         description="반복 간격(개월)",
         examples=[1, 3, 6, 12],
         default=None,
     )
-    frequency: str = Field(
+    frequency: CalendarRecurringFrequencyEnum = Field(
         description="반복 주기",
-        examples=["일", "월", "년"],
+        examples=["일", "주", "월", "년"],
         default=None,
     )
 

@@ -51,7 +51,6 @@ class CalendarService:
         self, user_id: int, contact_id: UUID, calendar_input: schemas.CalendarInput
     ) -> schemas.CalendarOutput:
         """복수 일정을 조회합니다."""
-        # TODO: 반복일정 생성 추가
         if calendar_input.is_repeat:
             try:
                 recurring = await self._calendar_repo.create_recurring(
