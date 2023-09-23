@@ -78,9 +78,7 @@ async def social_login_callback(
 )
 async def logout(response: Response) -> RedirectResponse:
     """로그아웃합니다."""
-    # response.delete_cookie("access_token", domain="haenu.dev", path="/")
-    # response.delete_cookie("refresh_token", domain="haenu.dev", path="/")
-
+    response = RedirectResponse(url=config.frontend_url)
     response.set_cookie(
         key="access_token",
         value="",
@@ -100,7 +98,7 @@ async def logout(response: Response) -> RedirectResponse:
         secure=True,
     )
 
-    return RedirectResponse(url=config.frontend_url)
+    return response
 
 
 @router.get(
