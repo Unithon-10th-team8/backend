@@ -1,6 +1,8 @@
+from app.services.contact import ContactService
 from fastapi import Cookie, Depends, Request
 
 from app.base.auth import decode_token
+from app.repositories.contact import ContactRepository
 from app.repositories.user import UserRepository
 from app.schemas import UserProfile
 from app.services.user import UserService
@@ -41,3 +43,13 @@ def user_repo(session: AsyncSession = Depends(session)) -> UserRepository:
 
 def user_service(user_repo: UserRepository = Depends(user_repo)) -> UserService:
     return UserService(user_repo)
+
+
+def contact_repo(session: AsyncSession = Depends(session)) -> ContactRepository:
+    return ContactRepository(session)
+
+
+def contact_service(
+    contact_repo: ContactRepository = Depends(contact_repo),
+) -> ContactService:
+    return ContactService(contact_repo)
