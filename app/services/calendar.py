@@ -15,7 +15,13 @@ class CalendarService:
         if calendar is None:
             raise NotFoundError("일정이 존재하지 않습니다.")
 
-        return schemas.CalendarOutput.model_validate(calendar)
+        return schemas.CalendarContactOutput(
+            contacts=[
+                schemas.ContactOutput.model_validate(contact.contact)
+                for contact in calendar.calendar_contacts
+            ],
+            calendar=schemas.CalendarOutput.model_validate(calendar),
+        )
 
     async def fetch(
         self, contact_id: UUID, offset: int, limit: int

@@ -288,3 +288,8 @@ class CalendarRecurringOutput(BaseModel):
     )
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CalendarContactOutput(BaseModel):
+    calendar: CalendarOutput
+    contacts: list[ContactOutput]

@@ -69,7 +69,6 @@ async def social_login_callback(
     return RedirectResponse(config.frontend_url)
 
 
-# TODO: 로그인 구현 후 활성화
 @router.get(
     "/users/me",
     status_code=HTTP_200_OK,
@@ -111,7 +110,8 @@ async def update_user(
     user_service: UserService = Depends(deps.user_service),
 ) -> schemas.UserProfile:
     """내 정보를 수정합니다."""
-    # TODO: 로그인 구현 후 유저 유효성 검사
+    if user_id == current_user.id:
+        raise ValidationError("본인만 수정할 수 있습니다.")
     await user_service.update(user_id, user_input)
     user_profile = await user_service.get(user_id)
     return user_profile
