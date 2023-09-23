@@ -59,3 +59,15 @@ class CalendarService:
     async def delete(self, calendar_id: UUID) -> None:
         """일정을 삭제합니다."""
         await self._calendar_repo.delete(calendar_id)
+
+    async def update_is_complete(
+        self, calendar_id: UUID, is_complete: bool
+    ) -> schemas.CalendarOutput:
+        """일정을 수정합니다."""
+        calendar = await self._calendar_repo.update_is_complete(
+            calendar_id, is_complete
+        )
+        if calendar is None:
+            raise NotFoundError("일정이 존재하지 않습니다.")
+
+        return schemas.CalendarOutput.model_validate(calendar)

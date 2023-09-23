@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 
 from app import deps, schemas
@@ -24,6 +24,23 @@ async def fetch_user_calendars(
     """유저의 모든 캘린더를 가져옵니다."""
     calendars = await calendar_service.fetch_user_calendars(user_id, offset, limit)
     return calendars
+
+
+# 완료여부 변경
+@router.post(
+    "/calendars/{calendar_id}",
+    status_code=HTTP_200_OK,
+    response_model=schemas.CalendarOutput,
+)
+async def update_calendar_is_complete(
+    # current_user: schemas.UserProfile = Depends(deps.current_user),
+    calendar_id: UUID,
+    is_complete: bool = Body(..., embed=True),
+    calendar_service: CalendarService = Depends(deps.calendar_service),
+) -> schemas.CalendarOutput:
+    """일정을 완료 처리합니다."""
+    calendar = await calendar_service.update_is_complete(calendar_id, is_complete)
+    return calendar
 
 
 @router.get(
