@@ -3,6 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import orm
+from app.exceptions import NotFoundError
 from app.schemas import ContactInput
 from app.utils import tz_now
 from sqlalchemy.orm import selectinload
@@ -72,3 +73,21 @@ class ContactRepository:
             .values(deleted_at=tz_now())
         )
         await self._session.execute(query)
+
+    async def update_contact_importance(self, contact_id: UUID) -> orm.Contact:
+        query = (
+            sa.select(orm.Contact)
+            .where(
+                sa.and_(
+                    orm.Contact.id == contact_id,
+                    orm.Contact.deleted_at.is_(None),
+                )
+            )
+            .with_for_update()
+        )
+        res = await self._session.execute(query)
+        contact = res.scalar_one_or_none()
+        if not contact:
+            raise NotFoundError("존재하지 않는 연락처입니다.")
+        contact.is_important = not contact.is_important
+        return contact

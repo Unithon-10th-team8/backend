@@ -45,3 +45,10 @@ class ContactService:
     async def delete(self, contact_id: UUID) -> None:
         """연락처를 삭제합니다."""
         await self._contact_repo.delete(contact_id)
+
+    async def update_contact_importance(
+        self, contact_id: UUID
+    ) -> schemas.ContactOutput:
+        """연락처 중요여부를 수정합니다."""
+        contact = await self._contact_repo.update_contact_importance(contact_id)
+        return schemas.ContactOutput.model_validate(contact)

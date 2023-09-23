@@ -80,3 +80,18 @@ async def delete_contact(
     contact_service: ContactService = Depends(deps.contact_service),
 ) -> None:
     await contact_service.delete(contact_id)
+
+
+@router.post(
+    "/contacts/{contact_id}/importance",
+    status_code=HTTP_200_OK,
+    response_model=schemas.ContactOutput,
+)
+async def update_contact_importance(
+    contact_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
+    contact_service: ContactService = Depends(deps.contact_service),
+) -> schemas.ContactOutput:
+    """연락처의 '중요함' 상태를 업데이트합니다."""
+    contact = await contact_service.update_contact_importance(contact_id)
+    return contact

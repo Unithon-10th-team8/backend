@@ -52,6 +52,8 @@ class CalendarService:
     ) -> schemas.CalendarOutput:
         """복수 일정을 조회합니다."""
         if calendar_input.is_repeat:
+            if not calendar_input.recurring_input:
+                raise ValidationError("반복 설정이 필요합니다.")
             try:
                 recurring = await self._calendar_repo.create_recurring(
                     orm.CalendarRecurring(
@@ -112,7 +114,4 @@ class CalendarService:
     ) -> schemas.CalendarOutput:
         """일정 중요여부를 수정합니다."""
         calendar = await self._calendar_repo.update_calendar_importance(calendar_id)
-        if calendar is None:
-            raise NotFoundError("일정이 존재하지 않습니다.")
-
         return schemas.CalendarOutput.model_validate(calendar)
