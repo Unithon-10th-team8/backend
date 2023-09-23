@@ -48,7 +48,7 @@ async def update_calendar_completion(
     return calendar
 
 
-@router.patch(
+@router.post(
     "/calendars/{calendar_id}/importance",
     status_code=HTTP_200_OK,
     response_model=schemas.CalendarOutput,
