@@ -15,14 +15,13 @@ router = APIRouter()
     response_model=list[schemas.ContactOutput],
 )
 async def fetch_contact(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_service: ContactService = Depends(deps.contact_service),
     offset: int = 0,
     limit: int = 100,
 ) -> list[schemas.ContactOutput]:
     """복수 연락처를 조회합니다."""
-    user_id = 1  # TODO: 로그인 기능 추가하면 제거
-    contact = await contact_service.fetch(user_id, offset=offset, limit=limit)
+    contact = await contact_service.fetch(current_user.id, offset=offset, limit=limit)
     return contact
 
 
@@ -32,8 +31,8 @@ async def fetch_contact(
     response_model=schemas.ContactOutput,
 )
 async def get_contact(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_service: ContactService = Depends(deps.contact_service),
 ) -> schemas.ContactOutput:
     """연락처를 조회합니다."""
@@ -47,12 +46,11 @@ async def get_contact(
     response_model=schemas.ContactOutput,
 )
 async def create_contact(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_input: schemas.ContactInput,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_service: ContactService = Depends(deps.contact_service),
 ) -> schemas.ContactOutput:
-    user_id = 1  # TODO: 로그인 기능 추가하면 제거
-    contact = await contact_service.create(user_id, contact_input)
+    contact = await contact_service.create(current_user.id, contact_input)
     return contact
 
 
@@ -62,9 +60,9 @@ async def create_contact(
     response_model=schemas.ContactOutput,
 )
 async def update_contact(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_id: UUID,
     contact_input: schemas.ContactInput,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_service: ContactService = Depends(deps.contact_service),
 ) -> schemas.ContactOutput:
     contact = await contact_service.update(contact_id, contact_input)
@@ -77,8 +75,8 @@ async def update_contact(
     response_model=None,
 )
 async def delete_contact(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_service: ContactService = Depends(deps.contact_service),
 ) -> None:
     await contact_service.delete(contact_id)

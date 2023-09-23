@@ -15,17 +15,16 @@ router = APIRouter()
     response_model=list[schemas.CalendarOutput],
 )
 async def fetch_user_calendars(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     year: int | None = None,
     month: int | None = None,
     offset: int = 0,
     limit: int = 10,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> list[schemas.CalendarOutput]:
     """유저의 모든 캘린더를 가져옵니다."""
-    user_id = 1  # TODO: current_user.id
     calendars = await calendar_service.fetch_user_calendars(
-        user_id, year, month, offset, limit
+        current_user.id, year, month, offset, limit
     )
     return calendars
 
@@ -36,8 +35,8 @@ async def fetch_user_calendars(
     response_model=schemas.CalendarOutput,
 )
 async def update_calendar_completion(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
     """일정을 완료 처리합니다."""
@@ -65,8 +64,8 @@ async def update_calendar_importance(
     response_model=list[schemas.CalendarOutput],
 )
 async def fetch_calendar(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
     offset: int = 0,
     limit: int = 100,
@@ -82,9 +81,9 @@ async def fetch_calendar(
     response_model=schemas.CalendarOutput,
 )
 async def get_calendar(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_id: UUID,
     calendar_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
     """캘린더를 조회합니다."""
@@ -98,9 +97,9 @@ async def get_calendar(
     response_model=schemas.CalendarOutput,
 )
 async def create_calendar(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_id: UUID,
     calendar_input: schemas.CalendarInput,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
     """캘린더를 생성합니다."""
@@ -114,10 +113,10 @@ async def create_calendar(
     response_model=schemas.CalendarOutput,
 )
 async def update_calendar(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_id: UUID,
     calendar_id: UUID,
     calendar_input: schemas.CalendarInput,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> schemas.CalendarOutput:
     """캘린더를 수정합니다."""
@@ -131,9 +130,9 @@ async def update_calendar(
     response_model=None,
 )
 async def delete_calendar(
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
     contact_id: UUID,
     calendar_id: UUID,
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> None:
     """캘린더를 삭제합니다."""

@@ -7,7 +7,6 @@ from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 from app import deps, schemas
 from app.base.auth import login
 from app.base.config import config
-from app.base.provider import KakaoAuthProvider
 from app.base.provider import GoogleAuthProvider
 
 from app.exceptions import ValidationError
@@ -108,7 +107,7 @@ async def fetch_users(
 )
 async def update_user(
     user_id: int,
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     user_input: schemas.UserInput = Body(..., embed=True),
     user_service: UserService = Depends(deps.user_service),
 ) -> schemas.UserProfile:
@@ -125,8 +124,10 @@ async def update_user(
 )
 async def delete_user(
     user_id: int,
-    # current_user: schemas.UserProfile = Depends(deps.current_user),
+    current_user: schemas.UserProfile = Depends(deps.current_user),
     user_service: UserService = Depends(deps.user_service),
 ) -> None:
     """내 정보를 삭제합니다.(회원 탈퇴)"""
+    if current_user.id != user_id:
+        raise ValidationError("본인만 탈퇴할 수 있습니다.")
     await user_service.delete(user_id)
