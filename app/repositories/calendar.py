@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import orm
+from app.exceptions import NotFoundError
 from app.schemas import CalendarInput
 from app.utils import tz_now
 from sqlalchemy.orm import subqueryload
@@ -112,53 +113,41 @@ class CalendarRepository:
         )
         return updated_calendar.scalar_one_or_none()
 
-    async def update_calendar_completion(
-        self, calendar_id: UUID, is_complete: bool
-    ) -> orm.Calendar:
+    async def update_calendar_completion(self, calendar_id: UUID) -> orm.Calendar:
         query = (
-            sa.update(orm.Calendar)
+            sa.select(orm.Calendar)
             .where(
                 sa.and_(
                     orm.Calendar.id == calendar_id,
                     orm.Calendar.deleted_at.is_(None),
                 )
             )
-            .values(is_complete=is_complete)
+            .with_for_update()
         )
-        await self._session.execute(query)
-        await self._session.flush()
-        updated_calendar = await self._session.execute(
-            sa.select(orm.Calendar).where(
-                sa.and_(
-                    orm.Calendar.id == calendar_id, orm.Calendar.deleted_at.is_(None)
-                )
-            )
-        )
-        return updated_calendar.scalar_one_or_none()
+        res = await self._session.execute(query)
+        calendar = res.scalar_one_or_none()
+        if not calendar:
+            raise NotFoundError("존재하지 않는 일정입니다.")
+        calendar.is_complete = not calendar.is_complete
+        return calendar
 
-    async def update_calendar_importance(
-        self, calendar_id: UUID, is_important: bool
-    ) -> orm.Calendar:
+    async def update_calendar_importance(self, calendar_id: UUID) -> orm.Calendar:
         query = (
-            sa.update(orm.Calendar)
+            sa.select(orm.Calendar)
             .where(
                 sa.and_(
                     orm.Calendar.id == calendar_id,
                     orm.Calendar.deleted_at.is_(None),
                 )
             )
-            .values(is_important=is_important)
+            .with_for_update()
         )
-        await self._session.execute(query)
-        await self._session.flush()
-        updated_calendar = await self._session.execute(
-            sa.select(orm.Calendar).where(
-                sa.and_(
-                    orm.Calendar.id == calendar_id, orm.Calendar.deleted_at.is_(None)
-                )
-            )
-        )
-        return updated_calendar.scalar_one_or_none()
+        res = await self._session.execute(query)
+        calendar = res.scalar_one_or_none()
+        if not calendar:
+            raise NotFoundError("존재하지 않는 일정입니다.")
+        calendar.is_important = not calendar.is_important
+        return calendar
 
     async def delete(self, calendar_id: UUID) -> None:
         query = (
