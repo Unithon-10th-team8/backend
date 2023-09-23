@@ -44,6 +44,23 @@ async def update_calendar_completion(
     return calendar
 
 
+@router.patch(
+    "/calendars/{calendar_id}/importance",
+    status_code=HTTP_200_OK,
+    response_model=schemas.CalendarOutput,
+)
+async def update_calendar_importance(
+    calendar_id: UUID,
+    is_important: bool = Body(..., embed=True),
+    calendar_service: CalendarService = Depends(deps.calendar_service),
+) -> schemas.CalendarOutput:
+    """일정의 '중요함' 상태를 업데이트합니다."""
+    calendar = await calendar_service.update_calendar_importance(
+        calendar_id, is_important
+    )
+    return calendar
+
+
 @router.get(
     "/contacts/{contact_id}/calendars",
     status_code=HTTP_200_OK,

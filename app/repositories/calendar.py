@@ -108,6 +108,30 @@ class CalendarRepository:
         )
         return updated_calendar.scalar_one_or_none()
 
+    async def update_calendar_importance(
+        self, calendar_id: UUID, is_important: bool
+    ) -> orm.Calendar:
+        query = (
+            sa.update(orm.Calendar)
+            .where(
+                sa.and_(
+                    orm.Calendar.id == calendar_id,
+                    orm.Calendar.deleted_at.is_(None),
+                )
+            )
+            .values(is_important=is_important)
+        )
+        await self._session.execute(query)
+        await self._session.flush()
+        updated_calendar = await self._session.execute(
+            sa.select(orm.Calendar).where(
+                sa.and_(
+                    orm.Calendar.id == calendar_id, orm.Calendar.deleted_at.is_(None)
+                )
+            )
+        )
+        return updated_calendar.scalar_one_or_none()
+
     async def delete(self, calendar_id: UUID) -> None:
         query = (
             sa.update(orm.Calendar)
