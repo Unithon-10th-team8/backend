@@ -96,6 +96,21 @@ scripts/up.sh
 
 <br><br>
 
+## API 명세
+
+OpenAPI
+
+```
+http://0.0.0.0:8000/docs
+```
+
+```
+http://0.0.0.0:8000/redoc
+```
+
+
+<br><br>
+
 ## 폴더 구조
 
 - alembic: Alembic 마이그레이션 관련 폴더.

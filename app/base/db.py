@@ -39,6 +39,9 @@ class TimestampBase(Base):
         server_default=sa.func.now(),
         onupdate=sa.func.now(),
     )
+    deleted_at: Mapped[datetime.datetime] = mapped_column(
+        sa.DateTime(timezone=True), nullable=True, default=None
+    )
 
 
 class DB:
