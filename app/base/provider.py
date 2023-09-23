@@ -69,7 +69,7 @@ class GoogleAuthProvider:
 
         data = res.json()
         self._access_token = data["access_token"]
-        self._refresh_token = data["refresh_token"]
+        self._refresh_token = data.get("refresh_token", "")
         return self._access_token
 
     def get_user_info(self) -> GoogleProviderUserInfo:
