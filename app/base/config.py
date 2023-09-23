@@ -13,6 +13,7 @@ class Config(BaseSettings):
     class Config:
         env_file = "./secrets/.env"
         env_file_encoding = "utf-8"
+        extra = "allow"
 
 
 config = Config()
