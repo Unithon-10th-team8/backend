@@ -29,7 +29,7 @@ async def fetch_contact(
 @router.get(
     "/contacts/{contact_id}",
     status_code=HTTP_200_OK,
-    response_model=None,
+    response_model=schemas.ContactOutput,
 )
 async def get_contact(
     # current_user: schemas.UserProfile = Depends(deps.current_user),

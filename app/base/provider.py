@@ -13,8 +13,8 @@ class GoogleProviderUserInfo(TypedDict):
     email: str
     name: str
     picture: str
-    access_token: str = ''
-    refresh_token: str = ''
+    access_token: str
+    refresh_token: str
 
 
 class KakaoAuthProvider:
@@ -40,7 +40,9 @@ class KakaoAuthProvider:
 
 
 class GoogleAuthProvider:
-    def __init__(self, code: str = '', access_token: str = '', refresh_token: str = '') -> None:
+    def __init__(
+        self, code: str = "", access_token: str = "", refresh_token: str = ""
+    ) -> None:
         self._code = code
         self._access_token = access_token
         self._refresh_token = refresh_token
@@ -84,7 +86,12 @@ class GoogleAuthProvider:
             raise ValidationError(message)
 
         data = res.json()
-        user_info = GoogleProviderUserInfo(uid=str(data["id"]), email=data["email"], name=data["name"],
-                                           picture=data["picture"], access_token=self._access_token,
-                                           refresh_token=self._refresh_token)
+        user_info = GoogleProviderUserInfo(
+            uid=str(data["id"]),
+            email=data["email"],
+            name=data["name"],
+            picture=data["picture"],
+            access_token=self._access_token,
+            refresh_token=self._refresh_token,
+        )
         return user_info
