@@ -60,11 +60,11 @@ class CalendarService:
         """일정을 삭제합니다."""
         await self._calendar_repo.delete(calendar_id)
 
-    async def update_is_complete(
+    async def update_calendar_completion(
         self, calendar_id: UUID, is_complete: bool
     ) -> schemas.CalendarOutput:
         """일정을 수정합니다."""
-        calendar = await self._calendar_repo.update_is_complete(
+        calendar = await self._calendar_repo.update_calendar_completion(
             calendar_id, is_complete
         )
         if calendar is None:

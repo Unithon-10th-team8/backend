@@ -84,7 +84,7 @@ class CalendarRepository:
         )
         return updated_calendar.scalar_one_or_none()
 
-    async def update_is_complete(
+    async def update_calendar_completion(
         self, calendar_id: UUID, is_complete: bool
     ) -> orm.Calendar:
         query = (
