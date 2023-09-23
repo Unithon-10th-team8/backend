@@ -59,9 +59,9 @@ class ContactInput(BaseModel):
         examples=[True],
         default=False,
     )
-    repeat_interval: int | None = Field(
+    repeat_interval: str | None = Field(
         description="반복주기(개월)",
-        examples=[1, 3, 6, 12],
+        examples=["1", "3", "6", "12"],
         default=None,
     )
     repeat_base_date: datetime.datetime | None = Field(
@@ -182,9 +182,9 @@ class ContactOutput(BaseModel):
         examples=[True],
         default=False,
     )
-    repeat_interval: int | None = Field(
+    repeat_interval: str | None = Field(
         description="반복주기(개월)",
-        examples=[1, 3, 6, 12],
+        examples=["1", "3", "6", "12"],
         default=None,
     )
     repeat_base_date: datetime.datetime | None = Field(
