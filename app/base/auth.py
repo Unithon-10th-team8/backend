@@ -55,5 +55,4 @@ def _set_cookie(response: Response, key: str, value: str) -> None:
         # domain=config.frontend_domain,
         httponly=True,
         secure=True,
-        same_site="none",
     )
