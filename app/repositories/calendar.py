@@ -120,7 +120,6 @@ class CalendarRepository:
                 remind_interval=calendar_input.remind_interval,
                 completed_at=calendar_input.completed_at,
                 tags=calendar_input.tags,
-                contact_id=calendar_id,
             )
         )
         await self._session.execute(query)
