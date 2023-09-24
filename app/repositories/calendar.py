@@ -108,7 +108,20 @@ class CalendarRepository:
                     orm.Calendar.deleted_at.is_(None),
                 )
             )
-            .values(calendar_input.model_dump())
+            .values(
+                name=calendar_input.name,
+                start_dt=calendar_input.start_dt,
+                end_dt=calendar_input.end_dt,
+                content=calendar_input.content,
+                is_all_day=calendar_input.is_all_day,
+                is_repeat=calendar_input.is_repeat,
+                is_complete=calendar_input.is_complete,
+                is_important=calendar_input.is_important,
+                remind_interval=calendar_input.remind_interval,
+                completed_at=calendar_input.completed_at,
+                tags=calendar_input.tags,
+                contact_id=calendar_id,
+            )
         )
         await self._session.execute(query)
         await self._session.flush()
