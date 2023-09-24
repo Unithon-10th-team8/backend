@@ -18,7 +18,7 @@ async def fetch_user_calendars(
     year: int | None = None,
     month: int | None = None,
     offset: int = 0,
-    limit: int = 10,
+    limit: int = 100,
     current_user: schemas.UserProfile = Depends(deps.current_user),
     calendar_service: CalendarService = Depends(deps.calendar_service),
 ) -> list[schemas.CalendarOutput]:

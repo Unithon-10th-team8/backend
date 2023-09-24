@@ -94,11 +94,11 @@ class CalendarService:
                         contact_id=contact_id,
                         calendar_recurring_id=recurring.id,
                     )
-                    calendar = await self._calendar_repo.create(contact_id, calendar)
-                    calendars.append(calendar)
+                    result = await self._calendar_repo.create(contact_id, calendar)
+                    calendars.append(result)
 
                 # 반복 일정을 생성했을 경우 첫번째 생성된 일정만 반환합니다.
-                return calendars[0]
+                return schemas.CalendarOutput.model_validate(calendars[0])
 
             except Exception as e:
                 logging.debug(f"반복 설정 생성 실패 {e}")
@@ -120,8 +120,8 @@ class CalendarService:
                 calendar_recurring_id=None,
             )
 
-            calendar = await self._calendar_repo.create(contact_id, calendar)
-            return calendar
+            result = await self._calendar_repo.create(contact_id, calendar)
+            return schemas.CalendarOutput.model_validate(result)
 
     async def update(
         self, calendar_id: UUID, calendar_input: schemas.CalendarInput
